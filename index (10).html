@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naya Roquemore, Executive Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a slide-by-slide module, one idea per screen, ink-navy stage with a warm gold "ticket" accent like a boarding pass */
+:root{
+  --ink:#14213d;        /* stage text / dark surfaces */
+  --paper:#f6f7fb;      /* page background */
+  --card:#ffffff;
+  --muted:#5b6478;
+  --gold:#e0a526;       /* accent */
+  --sky:#3b6fd8;        /* secondary accent */
+  --good:#1f8f5f; --bad:#c2413b;
+  --line:#dfe3ec;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#eef1f8; --paper:#0f1626; --card:#18223a; --muted:#a7b0c4;
+    --gold:#f0b93e; --sky:#7aa2f7; --good:#4cc38a; --bad:#ef7d77; --line:#2a3655;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eef1f8; --paper:#0f1626; --card:#18223a; --muted:#a7b0c4;
+  --gold:#f0b93e; --sky:#7aa2f7; --good:#4cc38a; --bad:#ef7d77; --line:#2a3655;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:16px;padding:14px clamp(16px,4vw,40px);border-bottom:1px solid var(--line);background:var(--card)}
+.brand{font-family:var(--display);font-weight:800;font-size:18px;white-space:nowrap}
+.brand span{color:var(--gold)}
+.progress{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--gold));transition:width .4s ease}
+.count{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;white-space:nowrap}
+.menu-btn{border:1px solid var(--line);background:transparent;border-radius:10px;padding:6px 12px;font-size:14px;font-weight:600}
+
+/* stage */
+.stage{flex:1;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;overflow-y:auto;padding:clamp(20px,4vw,48px) clamp(16px,5vw,64px) 110px;display:none}
+.slide.on{display:block;animation:in .45s ease}
+@keyframes in{from{opacity:.0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1080px;margin:0 auto}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+.h2{font-size:clamp(28px,4vw,44px);line-height:1.08;margin-bottom:10px}
+.lede{color:var(--muted);max-width:62ch;margin:0 0 26px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px clamp(16px,4vw,40px);background:linear-gradient(transparent,var(--paper) 35%)}
+.nav button{border:0;border-radius:99px;padding:12px 22px;font-weight:700;white-space:nowrap}
+.prev{background:var(--card);border:1px solid var(--line)!important}
+.next{background:var(--ink);color:var(--paper)}
+.dots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.dots button{width:10px;height:10px;padding:0!important;border-radius:50%;background:var(--line)}
+.dots button.on{background:var(--gold);transform:scale(1.3)}
+
+/* cover */
+.cover{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;min-height:100%}
+.cover h1{font-size:clamp(40px,6.4vw,78px);line-height:.98;font-weight:800}
+.cover h1 em{font-style:normal;background:linear-gradient(transparent 62%,color-mix(in srgb,var(--gold) 55%,transparent) 62%)}
+.who{font-size:20px;font-weight:600;margin:22px 0 6px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.btn{border:0;border-radius:99px;padding:14px 24px;font-weight:700;background:var(--gold);color:#14213d}
+.btn.ghost{background:transparent;border:1.5px solid var(--ink);color:var(--ink)}
+.pass{background:var(--ink);color:var(--paper);border-radius:22px;padding:26px;position:relative;box-shadow:0 20px 50px -20px rgba(20,33,61,.5)}
+.pass:before,.pass:after{content:"";position:absolute;left:-12px;top:62%;width:24px;height:24px;border-radius:50%;background:var(--paper)}
+.pass:after{left:auto;right:-12px}
+.pass small{opacity:.7;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.pass .route{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:34px;font-weight:800;margin:6px 0 16px}
+.pass .route span{font-size:16px;opacity:.6;font-weight:600}
+.pass .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1.5px dashed rgba(255,255,255,.25);padding-top:16px;margin-top:6px}
+.pass b{display:block;font-size:15px}
+:root[data-theme="dark"] .pass .row,
+:root:not([data-theme="light"]) .pass .row{border-top-color:color-mix(in srgb,var(--paper) 30%,transparent)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:left;transition:transform .2s,border-color .2s}
+.stat:hover{transform:translateY(-3px);border-color:var(--gold)}
+.stat .n{font-family:var(--display);font-weight:800;font-size:clamp(38px,5vw,56px);line-height:1;font-variant-numeric:tabular-nums;color:var(--sky)}
+.stat .l{font-weight:600;margin-top:6px}
+.stat .src{color:var(--muted);font-size:14px;margin-top:10px;max-height:0;overflow:hidden;transition:max-height .3s}
+.stat.open .src{max-height:120px}
+.stat .hint{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* flip cards */
+.meter{display:flex;align-items:center;gap:12px;margin-bottom:18px;font-weight:600}
+.meter .bar{flex:1;max-width:280px;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:var(--good);transition:width .3s}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.flip{perspective:1000px;background:none;border:0;padding:0;min-height:220px;text-align:left}
+.flip .in{position:relative;height:100%;min-height:220px;transition:transform .6s;transform-style:preserve-3d}
+.flip.done .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;padding:18px;backface-visibility:hidden;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);overflow:auto}
+.front{background:var(--card)}
+.front .tag{font-size:12px;font-weight:700;color:var(--sky);letter-spacing:.08em;text-transform:uppercase}
+.front p{margin:0;font-weight:600;font-size:16px;line-height:1.4}
+.front .tap{margin-top:auto;font-size:13px;color:var(--muted)}
+.back{background:var(--ink);color:var(--paper);transform:rotateY(180deg);font-size:15px}
+.back .tag{color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.back p{margin:0}
+
+/* day timeline */
+.day{display:grid;grid-template-columns:220px 1fr;gap:24px}
+.times{display:flex;flex-direction:column;gap:8px}
+.times button{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;font-weight:600}
+.times button .t{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;width:64px}
+.times button.on{border-color:var(--gold);box-shadow:inset 4px 0 0 var(--gold)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px}
+.panel .big{font-family:var(--display);font-size:clamp(24px,3vw,34px);font-weight:700;line-height:1.15;margin:4px 0 12px}
+.panel ul{margin:0;padding-left:20px}
+.panel li{margin:6px 0}
+.panel .jd{margin-top:18px;font-size:14px;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+
+
+/* quiz */
+.quiz{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,3vw,32px);max-width:820px}
+.qhead{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.clock{display:inline-block;background:var(--ink);color:var(--paper);border-radius:8px;padding:2px 10px;font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;margin-bottom:10px}
+.quiz h3{font-size:clamp(20px,2.4vw,26px);margin-bottom:16px;line-height:1.25}
+.opts{display:grid;gap:10px}
+.opt{background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;font-weight:500}
+.opt:hover:not([disabled]){border-color:var(--sky)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--card))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--card))}
+.opt[disabled]{cursor:default}
+.fb{margin-top:16px;padding:14px 16px;border-radius:14px;background:color-mix(in srgb,var(--sky) 10%,var(--card));display:none}
+.fb.show{display:block}
+.qnext{margin-top:16px}
+
+/* promises */
+.promises{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.promise{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:left;transition:border-color .2s,background .2s}
+.promise .box{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;transition:all .2s}
+.promise .box svg{width:16px;height:16px;stroke:#fff;stroke-width:3;fill:none;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s ease .05s}
+.promise.on{border-color:var(--good);background:color-mix(in srgb,var(--good) 7%,var(--card))}
+.promise.on .box{background:var(--good);border-color:var(--good)}
+.promise.on .box svg{stroke-dashoffset:0}
+.promise b{display:block;font-size:17px;margin-bottom:4px}
+.promise span{color:var(--muted);font-size:15px}
+.result{margin-top:20px;font-weight:700;font-size:18px;min-height:28px}
+
+/* career */
+.tl{position:relative;display:grid;gap:16px;padding-left:28px}
+.tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;background:var(--line);border-radius:3px}
+.job{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.job:before{content:"";position:absolute;left:-27px;top:22px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--sky)}
+.job.ea:before{border-color:var(--gold);background:var(--gold)}
+.job header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.job h3{font-size:20px}
+.job .co{color:var(--muted);font-weight:600}
+.job .when{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;font-weight:600}
+.wins{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.win{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600}
+.win b{color:var(--sky)}
+
+/* toolkit */
+.kit{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.group{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.group h3{font-size:18px;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600;background:var(--paper)}
+
+/* contact */
+.contact{max-width:760px}
+.contact h2{font-size:clamp(36px,5.5vw,64px);line-height:1}
+.ways{display:grid;gap:12px;margin:26px 0}
+.way{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px}
+.way small{display:block;color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.way a{color:var(--ink);font-weight:700;font-size:18px}
+.copy{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:8px 16px;font-weight:700;font-size:14px}
+
+/* menu overlay */
+.menu{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 55%,transparent);display:none;place-items:center;z-index:9;padding:16px}
+.menu.open{display:grid}
+.menu .sheet{background:var(--card);border-radius:20px;padding:22px;width:min(440px,100%);max-height:90%;overflow:auto}
+.menu .sheet h3{margin-bottom:12px}
+.menu .sheet button{display:flex;width:100%;gap:12px;text-align:left;background:none;border:0;border-radius:10px;padding:10px 12px;font-weight:600}
+.menu .sheet button:hover{background:var(--paper)}
+.menu .sheet button span{color:var(--muted);font-variant-numeric:tabular-nums;width:22px}
+
+
+/* agenda */
+.mail{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.mailhead{display:grid;gap:4px;padding:18px 22px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+.mailhead b{color:var(--ink)}
+.mailhead .subj{font-family:var(--display);font-size:clamp(18px,2.2vw,22px);font-weight:700;color:var(--ink);margin-top:4px}
+.agtools{display:flex;gap:8px;flex-wrap:wrap;padding:12px 22px;border-bottom:1px solid var(--line);background:var(--paper)}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 14px;font-weight:700;font-size:14px}
+.pill.go{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.agbody{display:grid;grid-template-columns:1.6fr 1fr;gap:0}
+.events{padding:14px 22px 22px;display:grid;gap:10px;border-right:1px solid var(--line)}
+.ev{border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.ev summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:120px 1fr auto;gap:12px;align-items:center;padding:12px 14px}
+.ev summary::-webkit-details-marker{display:none}
+.ev .when{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;color:var(--sky)}
+.ev .what{font-weight:700}
+.ev .what small{display:block;font-weight:500;color:var(--muted);font-size:13px}
+.ev .chev{transition:transform .2s;color:var(--muted)}
+.ev[open] .chev{transform:rotate(90deg)}
+.ev.key{border-left:4px solid var(--gold)}
+.ev.travel{border-left:4px solid var(--sky)}
+.ev dl{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;margin:0;padding:0 14px 14px 14px;font-size:15px}
+.ev dt{color:var(--muted);font-weight:600}
+.ev dd{margin:0}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px}
+.fake-link{color:var(--sky);text-decoration:underline;text-underline-offset:2px}
+.side{padding:18px 22px;display:grid;gap:18px;align-content:start}
+.side h3{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.side ol,.side ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:15px}
+.badge{display:inline-block;background:color-mix(in srgb,var(--sky) 14%,var(--card));color:var(--sky);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:6px;vertical-align:middle}
+.toast{min-height:22px;font-weight:700;color:var(--good);font-size:14px;align-self:center}
+@media (max-width:860px){.agbody{grid-template-columns:1fr}.events{border-right:0;border-bottom:1px solid var(--line)}.ev summary{grid-template-columns:1fr auto}.ev .when{grid-column:1/-1}.ev dl{grid-template-columns:1fr}}
+
+@media (max-width:780px){
+  .cover,.day{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .times{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .times button{flex:none}
+  .brand{font-size:16px}
+}
+@media (max-width:520px){ .dots{display:none} .nav button{padding:10px 18px} }
+@media (max-width:420px){ .stats{grid-template-columns:1fr} .count{display:none} }
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">Naya Roquemore <span>·</span> EA</div>
+  <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+  <div class="count" id="count">1 / 10</div>
+  <button class="menu-btn" id="menuBtn" aria-haspopup="dialog">Contents</button>
+</div>
+
+<main class="stage" id="stage">
+
+<!-- 1 COVER -->
+<section class="slide on" data-title="Welcome">
+  <div class="wrap cover">
+    <div>
+      <div class="eyebrow">Executive Assistant portfolio</div>
+      <h1>I give leaders their <em>time back.</em></h1>
+      <p class="who">Naya Roquemore, Executive Assistant</p>
+      <p class="lede">5+ years of Administrative, Business Support, and customer service experience supporting leaders in fast-paced, technology-driven environments. This short, interactive tour shows how I would handle your calendar, travel, meetings, and priorities.</p>
+      <div class="cta">
+        <button class="btn" data-go="1">Start the tour →</button>
+        <button class="btn ghost" data-go="6">How I'll make your day easier</button>
+      </div>
+    </div>
+    <div class="pass" aria-label="Boarding pass style summary">
+      <small>Boarding pass · Your next EA</small>
+      <div class="route">CHAOS <span>✈</span> CALM</div>
+      <div class="row">
+        <div><small>Trips arranged</small><b>50+ a year</b></div>
+        <div><small>Meetings scheduled</small><b>25+ a month</b></div>
+        <div><small>Largest event</small><b>100+ attendees</b></div>
+        <div><small>Time saved for leaders</small><b>5+ hrs a week</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 NUMBERS -->
+<section class="slide" data-title="By the numbers">
+  <div class="wrap">
+    <div class="eyebrow">By the numbers</div>
+    <h2 class="h2">Results you can count on</h2>
+    <p class="lede">Click any number to see where it comes from.</p>
+    <div class="stats">
+      <button class="stat"><div class="n" data-to="50" data-suf="+">0</div><div class="l">Trips arranged a year</div><div class="hint">Where is this from?</div><div class="src">Sutton Chevrolet: complex international and domestic travel plans, with detailed itineraries and agendas for 2 leaders.</div></button>
+      <button class="stat"><div class="n" data-to="25" data-suf="+">0</div><div class="l">Meetings and events a month</div><div class="hint">Where is this from?</div><div class="src">Sutton Chevrolet: meetings, events, off-sites, and mini-summits, plus agendas, notes, minutes, and follow-up items.</div></button>
+      <button class="stat"><div class="n" data-to="100" data-suf="+">0</div><div class="l">Attendees at annual meetings</div><div class="hint">Where is this from?</div><div class="src">Sutton Chevrolet: annual meetings that drove deal flow and team collaboration.</div></button>
+      <button class="stat"><div class="n" data-to="5" data-suf="+ hrs">0</div><div class="l">Saved for leaders every week</div><div class="hint">Where is this from?</div><div class="src">Sutton Chevrolet: managing calendars and expenses for 2 busy leaders and partnering with Finance on budgets, approvals, and invoices.</div></button>
+      <button class="stat"><div class="n" data-to="1000" data-suf="+">0</div><div class="l">New hires onboarded</div><div class="hint">Where is this from?</div><div class="src">Evolve: project managed the onboarding program, cutting time to proficiency 22% and attrition 18%, with a 4.7/5 rating.</div></button>
+      <button class="stat"><div class="n" data-to="95" data-suf="%">0</div><div class="l">Leader assessment scores (from 75%)</div><div class="hint">Where is this from?</div><div class="src">Wingstop: organized training activities and onboarding sessions for 10–25 leaders across 10+ locations.</div></button>
+    </div>
+  </div>
+</section>
+
+<!-- 3 JOB PROVEN -->
+<section class="slide" data-title="The job, proven">
+  <div class="wrap">
+    <div class="eyebrow">The job, proven</div>
+    <h2 class="h2">Every Executive Assistant duty, matched to my experience</h2>
+    <p class="lede">These 11 responsibilities come straight from a real Executive Assistant posting at a leading tech company. Flip each card to see where I've already done it.</p>
+    <div class="meter"><span id="flipCount">0 of 11 revealed</span><div class="bar"><i id="flipBar"></i></div></div>
+    <div class="cards" id="cards"></div>
+  </div>
+</section>
+
+<!-- 4 DAY -->
+<section class="slide" data-title="A day with me">
+  <div class="wrap">
+    <div class="eyebrow">A day with me as your EA</div>
+    <h2 class="h2">What your day looks like with me</h2>
+    <p class="lede">Pick a time to see what I'm handling so you don't have to.</p>
+    <div class="day">
+      <div class="times" id="times" role="tablist" aria-label="Times of day"></div>
+      <div class="panel" id="dayPanel" role="tabpanel" aria-live="polite"></div>
+    </div>
+    <p class="note">A sample day based on the duties in the posting and the work I've done in past roles.</p>
+  </div>
+</section>
+
+
+<!-- DAILY AGENDA -->
+<section class="slide" data-title="Your daily agenda">
+  <div class="wrap">
+    <div class="eyebrow">Every morning by 7:00 AM</div>
+    <h2 class="h2">Your daily agenda, in your inbox</h2>
+    <p class="lede">Every morning you'll get one email with your whole day: times, Zoom links, presentations, drivers, flights, and what I'm handling for you. Here's a sample. Click any item to open it.</p>
+    <div class="mail" id="agenda">
+      <div class="mailhead">
+        <div><b>From:</b> Naya Roquemore · <b>To:</b> You · <b>Sent:</b> Mon, Nov 23, 2026, 7:00 AM</div>
+        <div class="subj">Your day at a glance: Monday, November 23, 2026 <span class="badge">Travel day</span></div>
+      </div>
+      <div class="agtools">
+        <button class="pill" id="agExpand">Open all</button>
+        <button class="pill" id="agCopy">Copy agenda</button>
+        <button class="pill go" id="agOk">Mark as reviewed</button>
+        <span class="toast" id="agToast" aria-live="polite"></span>
+      </div>
+      <div class="agbody">
+        <div class="events"><details class="ev "><summary><span class="when">8:15 – 8:45 AM</span><span class="what">Prep time: Google meeting<small>Focus block, no meetings</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Review</dt><dd>Presentation deck (final version) and 3 talking points I pulled together</dd><dt>Tech check</dt><dd>I'll join the Zoom at 8:55 AM to test audio, video, and screen share</dd></dl></details><details class="ev key"><summary><span class="when">9:00 – 9:45 AM</span><span class="what">Meeting with Mr. John Cave (Google)<small>Zoom · 45 minutes</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Zoom link</dt><dd><span class="code">ndindfjbf732n29</span></dd><dt>Attendees</dt><dd>Mr. John Cave (Google) and you</dd><dt>Goal</dt><dd>Agree on next steps and owners before the meeting ends</dd><dt>Presentation</dt><dd><span class="fake-link">Google Meeting Presentation (final version)</span>, shared drive</dd><dt>Meeting notes</dt><dd>I'll take notes. Summary and follow-up items in your inbox by 10:15 AM.</dd></dl></details><details class="ev "><summary><span class="when">9:45 – 10:30 AM</span><span class="what">Open time<small>Buffer for overruns and calls</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Use it for</dt><dd>Returning calls or reviewing anything urgent. I'll hold your calendar.</dd></dl></details><details class="ev key"><summary><span class="when">10:30 – 11:30 AM</span><span class="what">Monthly Company Meeting<small>Zoom · all staff</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Zoom link</dt><dd><span class="code">wodnr782927</span></dd><dt>Your part</dt><dd>Opening remarks (5 minutes) and closing Q&amp;A</dd><dt>Agenda</dt><dd>OKR progress, monthly business review highlights, and new leader welcomes</dd><dt>Meeting notes</dt><dd>I'll capture minutes and action items and send them to all staff by 3:00 PM.</dd></dl></details><details class="ev "><summary><span class="when">11:30 AM – 12:15 PM</span><span class="what">Lunch and pack<small>Lunch ordered, arriving at 11:35 AM</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Bring</dt><dd>Laptop and charger, ID, and phone charger. Boarding pass is on your phone.</dd></dl></details><details class="ev travel"><summary><span class="when">12:30 PM</span><span class="what">Car transportation to ATL Airport<small>Pickup at the front entrance</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Driver</dt><dd>David Grrom · black SUV · <span class="code">(404) 555-0187</span></dd><dt>Arrive at airport</dt><dd>About 1:10 PM, Domestic Terminal South. 30-minute traffic buffer included.</dd><dt>If it's late</dt><dd>Text me. I'll have a backup car on standby.</dd></dl></details><details class="ev travel key"><summary><span class="when">2:25 PM</span><span class="what">Flight boarding time<small>Departs 3:05 PM · Arrives 5:20 PM PT</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Flight</dt><dd>DL 1580, Atlanta (ATL) to San Francisco (SFO)</dd><dt>Seat</dt><dd>2A, window</dd><dt>Confirmation</dt><dd><span class="code">K7Q2LM</span></dd><dt>Gate</dt><dd>Posted about 90 minutes before departure. I'll text it to you.</dd><dt>Backup plan</dt><dd>I'm tracking the flight. If it's delayed, I'll rebook you on the next one.</dd></dl></details><details class="ev travel"><summary><span class="when">5:20 PM PT</span><span class="what">Arrive SFO, car to hotel<small>Driver meets you at baggage claim</small></span><span class="chev" aria-hidden="true">›</span></summary><dl><dt>Hotel</dt><dd>Check-in confirmed. Confirmation number is in your travel folder.</dd><dt>Tonight</dt><dd>No plans. Tomorrow's agenda will be in your inbox by 7:00 AM PT.</dd></dl></details></div>
+        <aside class="side">
+          <div><h3>Today's top 3</h3><ol><li>Agree on next steps with Google</li><li>Kick off the Monthly Company Meeting</li><li>Make the 3:05 PM flight</li></ol></div>
+          <div><h3>I'm handling</h3><ul><li>Google meeting notes and follow-up items</li><li>Company meeting minutes and action items</li><li>Flight tracking and backup options</li><li>Trip expense report</li><li>Tomorrow's agenda</li></ul></div>
+          <div><h3>Heads up</h3><ul><li>You have 15 minutes between your second meeting and lunch, so stay on time.</li><li>The car leaves at 12:30 PM sharp.</li></ul></div>
+        </aside>
+      </div>
+    </div>
+    <p class="note">Sample agenda. The flight, phone, and confirmation details are examples.</p>
+  </div>
+</section>
+
+<!-- 5 QUIZ -->
+<section class="slide" data-title="What would Naya do?">
+  <div class="wrap">
+    <div class="eyebrow">Play along</div>
+    <h2 class="h2">What would Naya do?</h2>
+    <p class="lede">Three real EA moments. Pick the move you'd want from your assistant.</p>
+    <div class="quiz" id="quiz"></div>
+  </div>
+</section>
+
+<!-- 6 PROMISES -->
+<section class="slide" data-title="How I'll make your day easier">
+  <div class="wrap">
+    <div class="eyebrow">My promise to you</div>
+    <h2 class="h2">How I'll make your day easier, every day</h2>
+    <p class="lede">Check off each one you'd like off your plate.</p>
+    <div class="promises" id="promises"></div>
+    <div class="result" id="promiseResult" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- 7 CAREER -->
+<section class="slide" data-title="Career highlights">
+  <div class="wrap">
+    <div class="eyebrow">Career highlights</div>
+    <h2 class="h2">Where I've delivered</h2>
+    <p class="lede">Every role has involved supporting leaders, organizing complex work, and keeping things moving.</p>
+    <div class="tl">
+      <article class="job"><header><div><h3>Learning Specialist, Onboarding &amp; Enablement</h3><div class="co">Wingstop · Contract</div></div><div class="when">Mar 2026 – Aug 2026</div></header>
+        <div class="wins"><span class="win">Leader scores <b>75% → 95%</b></span><span class="win"><b>25%</b> faster build time with AI tools</span><span class="win">Liaison to <b>6–10</b> stakeholders incl. Product Leadership</span></div></article>
+      <article class="job"><header><div><h3>Learning Specialist, Sales Onboarding &amp; Enablement</h3><div class="co">Evolve</div></div><div class="when">Nov 2023 – Mar 2026</div></header>
+        <div class="wins"><span class="win"><b>1,000+</b> new hires onboarded</span><span class="win">Time to proficiency <b>−22%</b></span><span class="win">OKRs &amp; monthly business reviews</span><span class="win">CSAT/NPS &amp; QA <b>+10%</b></span></div></article>
+      <article class="job ea"><header><div><h3>Executive Assistant</h3><div class="co">Sutton Chevrolet</div></div><div class="when">Apr 2019 – Nov 2023</div></header>
+        <div class="wins"><span class="win"><b>50+</b> trips a year</span><span class="win"><b>25+</b> meetings a month</span><span class="win"><b>100+</b> attendee annual meetings</span><span class="win"><b>5+ hrs</b> a week saved for leaders</span></div></article>
+      <article class="job"><header><div><h3>Office Manager &amp; Staff Trainer</h3><div class="co">Robins Eye Care</div></div><div class="when">Apr 2017 – Apr 2019</div></header>
+        <div class="wins"><span class="win"><b>~40</b> appointments scheduled a day</span><span class="win">Supervisor &amp; mentor to <b>8</b> staff</span><span class="win">Escalations <b>−19%</b></span></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- 8 TOOLKIT -->
+<section class="slide" data-title="Toolkit">
+  <div class="wrap">
+    <div class="eyebrow">Toolkit</div>
+    <h2 class="h2">Skills and tools I bring on day one</h2>
+    <div class="kit">
+      <div class="group"><h3>Executive &amp; administrative support</h3><div class="chips"><span class="chip">Calendar management</span><span class="chip">Expense management</span><span class="chip">Travel management</span><span class="chip">Itineraries &amp; agendas</span><span class="chip">Budgets &amp; invoices</span><span class="chip">Meeting notes &amp; minutes</span><span class="chip">Follow-up items</span></div></div>
+      <div class="group"><h3>Project management</h3><div class="chips"><span class="chip">Key initiatives</span><span class="chip">OKRs</span><span class="chip">Monthly business reviews</span><span class="chip">Leader onboarding</span><span class="chip">Lean Six Sigma</span><span class="chip">Microsoft Project</span></div></div>
+      <div class="group"><h3>Communication &amp; partnership</h3><div class="chips"><span class="chip">Presentations</span><span class="chip">Internal communications</span><span class="chip">Media communications</span><span class="chip">Product Leadership</span><span class="chip">Finance</span><span class="chip">HR</span><span class="chip">IT</span></div></div>
+      <div class="group"><h3>Tools</h3><div class="chips"><span class="chip">Google Workspace</span><span class="chip">PowerPoint</span><span class="chip">Salesforce CRM</span><span class="chip">Jira</span><span class="chip">Confluence</span><span class="chip">SharePoint</span><span class="chip">Power BI</span><span class="chip">Canva</span><span class="chip">Claude</span><span class="chip">ChatGPT</span><span class="chip">Microsoft Copilot</span><span class="chip">Gemini</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 CONTACT -->
+<section class="slide" data-title="Let's talk">
+  <div class="wrap contact">
+    <div class="eyebrow">Next step</div>
+    <h2>Let's give you your time back.</h2>
+    <p class="lede" style="margin-top:16px">I'd love 20 minutes to learn how you work and where your time goes today.</p>
+    <div class="ways">
+      <div class="way"><div><small>Email</small><a href="mailto:nayaroquemore@gmail.com">nayaroquemore@gmail.com</a></div><button class="copy" data-copy="nayaroquemore@gmail.com">Copy email</button></div>
+      <div class="way"><div><small>Phone</small><a href="tel:+14783026658">478-302-6658</a></div><button class="copy" data-copy="478-302-6658">Copy number</button></div>
+      <div class="way"><div><small>Location</small><b>Remote, United States</b></div></div>
+    </div>
+    <button class="btn ghost" data-go="0">↺ Start the tour again</button>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Slides">
+  <button class="prev" id="prev">← Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="next" id="next">Next →</button>
+</nav>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Contents">
+  <div class="sheet"><h3>Contents</h3><div id="menuList"></div></div>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const prog=document.getElementById('prog'),count=document.getElementById('count'),dots=document.getElementById('dots'),menuList=document.getElementById('menuList'),menu=document.getElementById('menu');
+slides.forEach((s,i)=>{
+  const d=document.createElement('button');d.setAttribute('aria-label','Go to slide '+(i+1)+': '+s.dataset.title);d.onclick=()=>go(i);dots.appendChild(d);
+  const m=document.createElement('button');m.innerHTML='<span>'+(i+1)+'</span>'+s.dataset.title;m.onclick=()=>{menu.classList.remove('open');go(i)};menuList.appendChild(m);
+});
+function go(i){
+  i=Math.max(0,Math.min(slides.length-1,i));
+  slides[cur].classList.remove('on');cur=i;slides[cur].classList.add('on');slides[cur].scrollTop=0;
+  prog.style.width=((cur+1)/slides.length*100)+'%';
+  count.textContent=(cur+1)+' / '+slides.length;
+  [...dots.children].forEach((d,j)=>d.classList.toggle('on',j===cur));
+  document.getElementById('prev').style.visibility=cur?'visible':'hidden';
+  document.getElementById('next').textContent=cur===slides.length-1?'Start over ↺':'Next →';
+  if(cur===1) countUp();
+}
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.getElementById('next').onclick=()=>go(cur===slides.length-1?0:cur+1);
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(+b.dataset.go));
+document.getElementById('menuBtn').onclick=()=>{menu.classList.add('open');menuList.querySelector('button').focus()};
+menu.onclick=e=>{if(e.target===menu)menu.classList.remove('open')};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')menu.classList.remove('open');
+  if(menu.classList.contains('open'))return;
+  if(e.target.closest&&e.target.closest('.times'))return;
+  if(e.key==='ArrowRight')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+let tx=null;const stage=document.getElementById('stage');
+stage.addEventListener('touchstart',e=>{tx=e.target.closest('.times')?null:e.touches[0].clientX},{passive:true});
+stage.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>70)go(cur+(dx<0?1:-1));tx=null});
+
+/* counters */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function countUp(){
+  document.querySelectorAll('.stat .n').forEach(el=>{
+    const to=+el.dataset.to,suf=el.dataset.suf,fmt=v=>v.toLocaleString('en-US')+suf;
+    if(reduce){el.textContent=fmt(to);return}
+    const t0=performance.now(),dur=1100;
+    (function f(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(f)})(t0);
+  });
+}
+document.querySelectorAll('.stat').forEach(s=>{s.onclick=()=>s.classList.toggle('open')});
+// resting state: show final numbers before animating
+document.querySelectorAll('.stat .n').forEach(el=>el.textContent=(+el.dataset.to).toLocaleString('en-US')+el.dataset.suf);
+
+/* flip cards: posting duty -> evidence */
+const duties=[
+ ['Travel','Arrange complex and detailed travel plans, international and domestic, plus itineraries and agendas','50+ international and domestic trips a year at Sutton Chevrolet, with detailed itineraries and agendas for 2 leaders.'],
+ ['Admin support','Provide administrative support, including calendar and expense management, in a timely manner','Managed calendars and expenses for 2 busy leaders and partnered with Finance on budgets, expense approvals, and invoices.'],
+ ['Anticipate','Anticipate the needs of a busy team and help them be more productive and successful','Saved leaders 5+ hours a week at Sutton Chevrolet. Cut team build time 25% at Wingstop.'],
+ ['Onboarding','Help organize training activities and onboarding sessions for new leaders','Organized onboarding for 10–25 leaders across 10+ Wingstop locations, raising scores from 75% to 95%.'],
+ ['Project management','Project manage key initiatives, such as OKRs and monthly business reviews','Project managed OKRs and monthly business reviews at Evolve, tracking metrics in Power BI and lifting CSAT/NPS and QA 10%+.'],
+ ['Judgment','Proactively resolve time-sensitive issues with excellent judgment and problem-solving','Resolved time-sensitive issues with minimal guidance as an EA, and time-sensitive scheduling issues across 3 office locations.'],
+ ['Meetings','Schedule meetings, mini-summits, and annual meetings to drive deal flow and collaboration','25+ meetings, events, off-sites, and mini-summits a month, including annual meetings of 100+ attendees that drove deal flow.'],
+ ['Communications','Assist with presentations, internal communications, and media communications','Built presentations and slide decks at Evolve. Created social posts, newsletters, and external messaging at Sutton Chevrolet and Robins Eye Care.'],
+ ['Meeting follow-up','Manage meeting agendas, notes and minutes, and follow-up items','Managed agendas, notes, minutes, and follow-up items for 25+ meetings a month.'],
+ ['Liaison','Build positive working relationships with Product Leadership, Finance, Communications, HR, and IT','Liaison to 11–15 stakeholders at Evolve across Product Leadership, IT, Finance, HR, Sales, Marketing, and QA, including software testing before rollouts.'],
+ ['Confidentiality','Handle confidential information professionally','Trusted with headcount activity, financial plans, and strategic partnerships, plus confidential patient and insurance information.'],
+];
+const cards=document.getElementById('cards');let flipped=0;
+duties.forEach(([tag,front,back])=>{
+  const b=document.createElement('button');b.className='flip';b.setAttribute('aria-label',tag+'. '+front+'. Flip to see the proof.');
+  b.innerHTML='<div class="in"><div class="face front"><div class="tag">'+tag+'</div><p>'+front+'</p><div class="tap">Tap to flip ↻</div></div><div class="face back"><div class="tag">Proof</div><p>'+back+'</p></div></div>';
+  b.onclick=()=>{
+    const was=b.classList.contains('done');b.classList.toggle('done');
+    if(!was&&!b.dataset.seen){b.dataset.seen=1;flipped++;}
+    document.getElementById('flipCount').textContent=flipped===11?'All 11 revealed: every duty covered ✓':flipped+' of 11 revealed';
+    document.getElementById('flipBar').style.width=(flipped/11*100)+'%';
+  };
+  cards.appendChild(b);
+});
+
+/* day timeline */
+const day=[
+ ['7:00 AM','Your daily agenda','In your inbox before your first meeting',['Daily agenda sent: times, links, travel, and notes','Calendar reviewed and conflicts cleared','Top priorities and today\'s agendas ready','Travel confirmations double-checked'],'Calendar management · Anticipate needs'],
+ ['9:00 AM','Travel, handled','Complex trips without the back-and-forth',['International and domestic travel booked','Itineraries and agendas in one place','Backup options ready if plans change'],'Arrange complex travel plans, itineraries, and agendas'],
+ ['11:00 AM','Business reviews, ready','OKRs and monthly business reviews on track',['Metrics and updates gathered from each team','Deck and talking points prepared','Owners and deadlines tracked'],'Project manage OKRs and monthly business reviews'],
+ ['1:00 PM','New leaders, welcomed','Onboarding that gets people productive fast',['Onboarding sessions scheduled and run','Training activities organized','Check-ins on the calendar'],'Organize training and onboarding for new leaders'],
+ ['3:00 PM','Fires, put out','Time-sensitive issues solved quietly',['Last-minute changes handled with minimal guidance','Stakeholders updated','Confidential matters kept confidential'],'Proactively resolve time-sensitive issues · Confidential information'],
+ ['5:30 PM','Nothing falls through','Every meeting ends with next steps',['Notes, minutes, and follow-up items sent','Expenses submitted','Tomorrow already prepped'],'Meeting agendas, notes, minutes, and follow-up items · Expense management'],
+];
+const times=document.getElementById('times'),panel=document.getElementById('dayPanel');
+function showDay(i){
+  [...times.children].forEach((b,j)=>{b.classList.toggle('on',j===i);b.setAttribute('aria-selected',j===i)});
+  const d=day[i];
+  panel.innerHTML='<div class="eyebrow">'+d[0]+'</div><div class="big">'+d[1]+'</div><p style="color:var(--muted);margin:0 0 12px">'+d[2]+'</p><ul>'+d[3].map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="jd">From the job description: '+d[4]+'</div>';
+}
+day.forEach((d,i)=>{const b=document.createElement('button');b.setAttribute('role','tab');b.innerHTML='<span class="t">'+d[0]+'</span>'+d[1];b.onclick=()=>showDay(i);times.appendChild(b)});
+showDay(0);
+
+/* daily agenda */
+const agEvents=[...document.querySelectorAll('#agenda details')],agToast=document.getElementById('agToast');
+function toast(t){agToast.textContent=t;clearTimeout(toast.t);toast.t=setTimeout(()=>agToast.textContent='',2200)}
+const agExpand=document.getElementById('agExpand');
+agExpand.onclick=()=>{const open=!agEvents.every(d=>d.open);agEvents.forEach(d=>d.open=open);agExpand.textContent=open?'Close all':'Open all'};
+agEvents.forEach(d=>d.addEventListener('toggle',()=>{agExpand.textContent=agEvents.every(x=>x.open)?'Close all':'Open all'}));
+document.getElementById('agCopy').onclick=async()=>{
+  const lines=['Your day at a glance: Monday, November 23, 2026',''];
+  agEvents.forEach(d=>{
+    lines.push(d.querySelector('.when').textContent+'  '+d.querySelector('.what').firstChild.textContent.trim());
+    const dts=d.querySelectorAll('dt'),dds=d.querySelectorAll('dd');
+    dts.forEach((t,i)=>lines.push('   - '+t.textContent+': '+dds[i].textContent));
+  });
+  try{await navigator.clipboard.writeText(lines.join('\n'));toast('Agenda copied ✓')}catch(e){toast('Copy is blocked here. Select the text to copy.')}
+};
+document.getElementById('agOk').onclick=e=>{e.target.textContent='Reviewed ✓';toast('Thanks! I\'ll keep you on schedule today.')};
+
+
+/* quiz */
+const qs=[
+ {clock:'6:40 AM',q:'Your flight to this morning\'s board meeting was just cancelled. You\'re still asleep. What should your EA do?',
+  o:['Email you and wait for instructions','Rebook the next flight, move your morning meetings, and send a new itinerary before you wake up','Cancel the board meeting'],a:1,
+  why:'Arranging complex travel and proactively resolving time-sensitive issues means you wake up to a solution, not a problem.'},
+ {clock:'1:55 PM',q:'Two VPs are both booked into your 2:00 PM. What should your EA do?',
+  o:['Keep whoever booked first','Check which meeting matters most to this quarter\'s OKRs, move the other with a new time, and confirm both with agendas','Leave it and let you decide in the moment'],a:1,
+  why:'Your calendar reflects your priorities. I schedule around the goals that matter and keep everyone informed.'},
+ {clock:'4:15 PM',q:'A team member asks to see the draft headcount plan on your desk. What should your EA do?',
+  o:['Share it, since they\'re on the team','Politely decline, point them to you, and let you know about the request','Send them a quick summary instead'],a:1,
+  why:'Headcount, financial plans, and strategic partnerships stay confidential. Every time.'},
+];
+let qi=0,score=0;const quiz=document.getElementById('quiz');
+function renderQ(){
+  if(qi>=qs.length){
+    quiz.innerHTML='<div class="clock">Final score</div><h3>'+score+' / 3. '+(score===3?'You think like a great EA. So do I.':'Here\'s the good news: with me, you won\'t have to.')+'</h3><p style="color:var(--muted)">Each answer reflects how I work: solve it first, keep you informed, and protect your time and your information.</p><div class="cta"><button class="btn" id="again">Play again</button><button class="btn ghost" data-go2="5">See my promises →</button></div>';
+    document.getElementById('again').onclick=()=>{qi=0;score=0;renderQ()};
+    quiz.querySelector('[data-go2]').onclick=()=>go(6);return;
+  }
+  const q=qs[qi];
+  quiz.innerHTML='<div class="qhead"><span>Moment '+(qi+1)+' of 3</span><span>Score: '+score+'</span></div><div class="clock">'+q.clock+'</div><h3>'+q.q+'</h3><div class="opts">'+q.o.map((o,i)=>'<button class="opt" data-i="'+i+'">'+o+'</button>').join('')+'</div><div class="fb" id="fb"></div>';
+  quiz.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i,ok=i===q.a;if(ok)score++;
+    quiz.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(+x.dataset.i===q.a)x.classList.add('right')});
+    if(!ok)b.classList.add('wrong');
+    const fb=document.getElementById('fb');fb.classList.add('show');
+    fb.innerHTML='<b>'+(ok?'Exactly what I\'d do.':'Here\'s what I\'d do instead.')+'</b> '+q.why+'<div class="qnext"><button class="btn">'+(qi<2?'Next moment →':'See my score →')+'</button></div>';
+    fb.querySelector('button').onclick=()=>{qi++;renderQ()};
+  });
+}
+renderQ();
+
+/* promises */
+const promises=[
+ ['A daily agenda by 7:00 AM','Your whole day in one email: meetings, links, travel, and your top 3 priorities.'],
+ ['Travel without stress','Every trip planned down to the itinerary, with backup options ready.'],
+ ['Meetings that move things forward','Agendas going in, notes, minutes, and follow-up items coming out.'],
+ ['Problems solved before they reach you','Time-sensitive issues handled with judgment and minimal guidance.'],
+ ['Your information stays protected','Headcount, financial plans, and partnerships handled professionally.'],
+ ['Hours back in your week','I saved leaders 5+ hours a week before. I\'ll aim to do the same for you.'],
+];
+const pw=document.getElementById('promises'),pr=document.getElementById('promiseResult');let pon=0;
+promises.forEach(([t,s])=>{
+  const b=document.createElement('button');b.className='promise';b.setAttribute('aria-pressed','false');
+  b.innerHTML='<span class="box"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span><div><b>'+t+'</b><span>'+s+'</span></div>';
+  b.onclick=()=>{const on=b.classList.toggle('on');b.setAttribute('aria-pressed',on);pon+=on?1:-1;
+    pr.textContent=pon===0?'':pon===6?'All 6 off your plate. That\'s the job, and I\'m ready for it.':pon+' of 6 off your plate.'};
+  pw.appendChild(b);
+});
+
+/* copy buttons */
+document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{
+  const old=b.textContent;
+  try{await navigator.clipboard.writeText(b.dataset.copy);b.textContent='Copied ✓'}catch(e){b.textContent='Select the text to copy'}
+  setTimeout(()=>b.textContent=old,1800);
+});
+
+go(0);
+</script>
+</body>
+</html>
